@@ -6,6 +6,7 @@ using ConsoleApp.Entities;
 using ConsoleApp.Types;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 #region ProductCategorySample
 
@@ -107,7 +108,6 @@ Console.WriteLine(nm3);
 #endregion
 
 // Tupple C# 7.0 - MVC tarafında : Birden fazla veriyi taşıya bilecek bir wrapper type
-
 #region TuppleSample
 
 Tuple<int,string,double> Tvariable = Tuple.Create<int, string, double>(3, "ali", 5);
@@ -179,12 +179,8 @@ Console.WriteLine($" money1Class3 equals moneyClass1 ={moneyClass1.Equals(moneyC
 // 2. DDD Domain Driven Design ile geliştirme yaparken, ValueObject denelin bir tip ile çalışıyoruz. ValueObject Id'si olmayan içindeki value değerleri ile aynı nesne olup olmadığını kıyasladığımız nesne. ShipAddress Address,County,City,PostalCode, GeoLocaltion=> Lat,Long
 
 #endregion
-
-
 // Serialization System.Text.Json => Newtonsoft'a göre daha lightweight bir kütüphane
-
 // C# Nenslerini XML,JSON tipine dönüştemek yada geri dönüştürme işlemlerin kullanıyoruz. DeSerialization
-
 #region SystemTextJson
 
 
@@ -212,7 +208,7 @@ var productJsonString = System.Text.Json.JsonSerializer.Serialize<Product>(produ
 var deSerializeProduct = System.Text.Json.JsonSerializer.Deserialize<Product>(productJsonString, jsonOptions);
 
 
-Console.ReadKey();
+
 
 
 
@@ -220,6 +216,87 @@ Console.ReadKey();
 #endregion
 
 
-// Regex
-// HashSet,Dictionary
+// List,HashSet,Dictionary
 
+#region Collections
+
+// Generic collections
+// kapasitelerini otomatik güncellemeleeri, arama,filtreleme,sıralama, ekleme, çıkarma, gncelleme gibi işlemlerde yoğun bir şekilde tercih ediyoruz.
+
+ICollection<Category> clist = new List<Category>();
+var category11 = new Category("C-1");
+clist.Add(category11);
+clist.Add(category11);
+
+// aynı referansta olduğu için ikiside güncellendi.
+clist.First().SetName("C-213213");
+
+clist.Where(x => x.IsDeleted == true).ToList();
+clist.OrderBy(x => x.Name).Skip(2).Take(2).ToList();
+clist.OrderBy(x => x.Name).ThenBy(x => x.IsDeleted).ToList();
+
+// Hashset unique instance ile çalışır eğer aynı obje referansı gönderilirse bunu eklemez. Bunun kontrolü için vardır. Code-defensing amaçlı HashSet
+
+HashSet<Category> hc = new HashSet<Category>();
+hc.Add(category11);
+hc.Add(category11);
+
+// ilk değer player name, ikinci değer score
+// playername unique olmalıdır
+IDictionary<string, int[]> scores = new Dictionary<string, int[]>();
+// dublicate key error.
+scores.Add("ali", new int[5] {10,15,25,30,35});
+scores.Add("ahmet", new int[5] {12,85,25,30,35});
+
+
+
+foreach (KeyValuePair<string, int[]> item in scores)
+{
+  Console.WriteLine($"Key: {scores.Keys}");
+  Console.WriteLine($"Values: {string.Join(',', scores.Values)}");
+
+  if (scores.ContainsKey("ali"))
+  {
+    // true
+  }
+
+  var value1 = scores["ali"]; // indeksinden value erişimde var.
+  
+}
+
+
+
+
+
+
+
+
+
+#endregion
+
+
+// Regex => Düzenli ifadeler => metinsel ifadeler arama, validasyon kontrolü gibi durumlarda yaygın kullanılan bir pattern format olarak kullanılıyor.
+
+#region Regex
+
+Match mathces = Regex.Match("deneme", "/[A-Z]/");
+// Tekli Match
+
+string input = "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+
+string pattern = @"\b\w+\b"; // kaç adet kelime geçiyor.
+
+
+string replacedString = Regex.Replace(input, "Lorem", "Den");
+
+string password = "MyP@ssw0rd";
+
+string passwordPattern = @"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+
+// yukarıdaki parola aşağıdaki pattern uyuyor mu?
+bool isMatch = Regex.IsMatch(password, passwordPattern);
+
+
+Console.ReadKey();
+
+#endregion
