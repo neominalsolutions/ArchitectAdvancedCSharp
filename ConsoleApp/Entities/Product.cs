@@ -5,14 +5,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ConsoleApp.Entities
 {
   public class Product : AuditableEntity<string>, ISoftDeleteEntity
   {
+    public decimal _oldPrice = 0.0M;
+
+    [JsonPropertyOrder(2)]
     public string Name { get; private set; }
+
+    [JsonPropertyName("_desc")]
+    // [JsonIgnore]
+    public string? Description { get; set; }
+
+    [JsonPropertyOrder(1)]
     public decimal Price { get; private set; }
+
+    [JsonPropertyOrder(3)]
     public int Stock { get; private set; }
     public bool IsDeleted { get; set; }
 
@@ -26,6 +38,17 @@ namespace ConsoleApp.Entities
     public Guid CategoryId { get; set; }
 
 
+    // Serialize ve Deserialize olurken bu contructor kullan
+
+    // Eğer [JsonConstructor] işaretlenmiş ise boş contructordan devam eder.
+    public Product()
+    {
+
+    }
+
+
+    // [JsonConstructor]
+    // Hangi contructor üzerinden deserialize edeceğimizi söylememiz lazım
     public Product(string name, decimal price, int stock)
     {
       Id = Guid.NewGuid().ToString();
